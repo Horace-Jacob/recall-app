@@ -248,7 +248,8 @@ if (!gotTheLock) {
     // Setup auto-updater
     if (!is.dev) {
       setupAutoUpdater();
-      setInterval(() => {
+      setTimeout(() => {
+        log.info('Checking for updates on startup...');
         autoUpdater.checkForUpdates();
       }, 5000);
     }
