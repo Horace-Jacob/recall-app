@@ -24,17 +24,7 @@
     "build:mac": "electron-vite build && electron-builder --mac",
     "build:linux": "electron-vite build && electron-builder --linux"
   },
-  "build": {
-    "win": {
-      "publish": [
-        {
-          "provider": "github",
-          "owner": "Horace-Jacob",
-          "repo": "recall-app"
-        }
-      ]
-    }
-  },
+  "builder": "electron-builder.yml",
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
