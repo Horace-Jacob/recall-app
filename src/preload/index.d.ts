@@ -61,6 +61,7 @@ declare global {
         ) => Promise<{ success: boolean; message?: string; error?: string }>;
       };
       update: {
+        checkForUpdates: () => void;
         onUpdateAvailable: (callback: (info: any) => void) => void;
         onUpdateDownloadProgress: (callback: (progress: any) => void) => void;
         onUpdateDownloaded: (callback: (info: any) => void) => void;

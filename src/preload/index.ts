@@ -84,6 +84,9 @@ if (process.contextIsolated) {
         processSingleUrl: (url: string) => ipcRenderer.invoke('process-single-url', url)
       },
       update: {
+        checkForUpdates: () => {
+          ipcRenderer.send('check-for-updates');
+        },
         onUpdateAvailable: (callback: (info: any) => void) => {
           ipcRenderer.on('update-available', (_, info) => callback(info));
         },

@@ -7,9 +7,9 @@ import { Loading } from '@renderer/components/Loading';
 const SettingsPage: React.FC = () => {
   const { session, loading } = useAuth();
 
-  const checkForUpdates = async (): Promise<void> => {
+  const checkForUpdates = (): void => {
     // Implement update check logic here
-    // await window.electronAPI.updater.checkForUpdates();
+    window.electronAPI.update.checkForUpdates();
   };
 
   return (

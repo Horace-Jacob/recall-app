@@ -250,6 +250,12 @@ if (!gotTheLock) {
       autoUpdater.quitAndInstall();
     });
 
+    ipcMain.on('check-for-updates', () => {
+      if (!is.dev) {
+        autoUpdater.checkForUpdates();
+      }
+    });
+
     // Setup auto-updater
     if (!is.dev) {
       setupAutoUpdater();
