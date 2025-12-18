@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { X, Download, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react';
+import { X, Download, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export function UpdateNotification() {
   const [updateState, setUpdateState] = useState<
@@ -45,9 +45,9 @@ export function UpdateNotification() {
     });
   }, []);
 
-  const handleInstallUpdate = async () => {
-    await window.electronAPI.update.quitAndInstallUpdate();
-  };
+  // const handleInstallUpdate = async () => {
+  //   await window.electronAPI.update.quitAndInstallUpdate();
+  // };
 
   const handleDismiss = () => {
     setIsDismissed(true);
@@ -134,18 +134,18 @@ export function UpdateNotification() {
             </div>
 
             <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-4 leading-relaxed">
-              The app will restart to complete the installation.
+              Please restart to complete the installation.
             </p>
 
             {/* Action buttons */}
             <div className="flex gap-2">
-              <button
+              {/* <button
                 onClick={() => handleInstallUpdate()}
                 className="flex-1 px-3 py-2 bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 text-sm font-medium rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all duration-200 flex items-center justify-center gap-2 group"
               >
                 <RefreshCw className="w-3.5 h-3.5 group-hover:rotate-180 transition-transform duration-500" />
                 Restart Now
-              </button>
+              </button> */}
               <button
                 onClick={handleDismiss}
                 className="px-4 py-2 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
