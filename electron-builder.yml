@@ -65,6 +65,7 @@ publish:
   - provider: github
     owner: Horace-Jacob
     repo: recall-app
+    releaseType: release
     draft: true
 
 electronDownload:
