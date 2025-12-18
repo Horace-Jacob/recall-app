@@ -64,11 +64,10 @@ appImage:
   artifactName: ${name}-${version}.${ext}
 
 publish:
-  - provider: 'github'
+  - provider: github
     owner: Horace-Jacob
     repo: recall-app
     releaseType: release
-    draft: true
 
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/
