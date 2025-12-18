@@ -115,7 +115,7 @@ export const OnBoardingPage: FC = () => {
                 onClick={handleSkip}
                 className="w-full px-6 py-4 text-foreground hover:text-secondary-foreground hover:bg-secondary rounded-xl font-medium transition-all duration-200"
               >
-                Skip for now
+                Skip
               </button>
             </div>
 

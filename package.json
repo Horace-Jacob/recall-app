@@ -1,6 +1,6 @@
 {
   "name": "recall-app",
-  "version": "0.0.11",
+  "version": "1.0.0",
   "description": "Recall App",
   "main": "./out/main/index.js",
   "author": "LON",
