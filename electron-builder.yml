@@ -64,7 +64,7 @@ appImage:
   artifactName: ${name}-${version}.${ext}
 
 publish:
-  - provider: github
+  - provider: 'github'
     owner: Horace-Jacob
     repo: recall-app
     releaseType: release
