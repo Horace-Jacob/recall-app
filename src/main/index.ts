@@ -17,16 +17,58 @@ import { registerHistoryProcessorHandler } from './data-processor/handlers/regis
 import { registerSearchHandlers } from './data-processor/handlers/register-search-handler';
 import 'dotenv/config';
 import { registerSingleUrlHandler } from './data-processor/handlers/register-single-url-handler';
-import { updateElectronApp } from 'update-electron-app';
+import { autoUpdater } from 'electron-updater';
 
 log.transports.file.level = 'info';
 
-// setup auto updates
-updateElectronApp({
-  updateInterval: '1 hour',
-  logger: log,
-  notifyUser: true
-});
+// Configrue auto-updater logging
+autoUpdater.logger = log;
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = true;
+
+// setup auto updater
+function setupAutoUpdater() {
+  // Check for updates every hour
+  setInterval(
+    () => {
+      if (!is.dev) {
+        autoUpdater.checkForUpdates();
+      }
+    },
+    60 * 60 * 1000
+  ); // 1 hour
+
+  // When update is available
+  autoUpdater.on('update-available', (info) => {
+    log.info('Update available:', info);
+
+    // Send to renderer to show notification
+    mainWindow?.webContents.send('update-available', info);
+
+    // Auto-download the update
+    autoUpdater.downloadUpdate();
+  });
+
+  // Download progress
+  autoUpdater.on('download-progress', (progress) => {
+    log.info('Download progress:', progress.percent);
+    mainWindow?.webContents.send('update-download-progress', progress);
+  });
+
+  // When update is downloaded
+  autoUpdater.on('update-downloaded', (info) => {
+    log.info('Update downloaded:', info);
+
+    // Send to renderer to show "restart to install" notification
+    mainWindow?.webContents.send('update-downloaded', info);
+  });
+
+  // Error handling
+  autoUpdater.on('error', (err) => {
+    log.error('Update error:', err);
+    mainWindow?.webContents.send('update-error', err);
+  });
+}
 
 // enable auto start on login
 app.setLoginItemSettings({
@@ -202,6 +244,14 @@ if (!gotTheLock) {
     app.on('before-quit', () => {
       isQuitting = true;
     });
+
+    // Setup auto-updater
+    if (!is.dev) {
+      setupAutoUpdater();
+      setInterval(() => {
+        autoUpdater.checkForUpdates();
+      }, 5000);
+    }
   });
 }
 

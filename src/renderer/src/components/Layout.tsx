@@ -5,6 +5,7 @@ import { Sidebar } from './sidebar/Sidebar';
 import { Loading } from './Loading';
 import { useAuth } from '@renderer/context/AuthContext';
 import { useShowOnboardBtn } from '@renderer/hooks/useShowOnboardBtn';
+import { UpdateNotification } from './UpdateNotification';
 
 export const Layout: FC = () => {
   // const sidebarToggle = localStorage.getItem('isSidebarOpen');
@@ -43,6 +44,7 @@ export const Layout: FC = () => {
         <Loading IsOpen={loading} />
       ) : (
         <div className="flex h-screen bg-background">
+          <UpdateNotification />
           <Sidebar isOpen={isSidebarOpen} />
 
           <div className="flex-1 flex flex-col">

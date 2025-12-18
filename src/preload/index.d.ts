@@ -60,6 +60,13 @@ declare global {
           url: string
         ) => Promise<{ success: boolean; message?: string; error?: string }>;
       };
+      update: {
+        onUpdateAvailable: (callback: (info: any) => void) => void;
+        onUpdateDownloadProgress: (callback: (progress: any) => void) => void;
+        onUpdateDownloaded: (callback: (info: any) => void) => void;
+        onUpdateError: (callback: (error: any) => void) => void;
+        quitAndInstallUpdate: () => void;
+      };
     };
   }
 }

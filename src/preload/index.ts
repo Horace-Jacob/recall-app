@@ -82,6 +82,23 @@ if (process.contextIsolated) {
       },
       ui: {
         processSingleUrl: (url: string) => ipcRenderer.invoke('process-single-url', url)
+      },
+      update: {
+        onUpdateAvailable: (callback: (info: any) => void) => {
+          ipcRenderer.on('update-available', (_, info) => callback(info));
+        },
+        onUpdateDownloadProgress: (callback: (progress: any) => void) => {
+          ipcRenderer.on('update-download-progress', (_, progress) => callback(progress));
+        },
+        onUpdateDownloaded: (callback: (info: any) => void) => {
+          ipcRenderer.on('update-downloaded', (_, info) => callback(info));
+        },
+        onUpdateError: (callback: (err: any) => void) => {
+          ipcRenderer.on('update-error', (_, err) => callback(err));
+        },
+        quitAndInstall: () => {
+          ipcRenderer.send('quit-and-install');
+        }
       }
     });
   } catch (error) {
