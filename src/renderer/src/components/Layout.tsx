@@ -125,7 +125,7 @@ export const Layout: FC = () => {
                             <Link to="/onboarding">
                               <button className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-foreground hover:bg-secondary transition-colors">
                                 <Chromium size={16} />
-                                <span>Complete onboarding</span>
+                                <span>Onboarding</span>
                               </button>
                             </Link>
                           ) : null}
