@@ -245,6 +245,11 @@ if (!gotTheLock) {
       isQuitting = true;
     });
 
+    ipcMain.on('quit-and-install', () => {
+      isQuitting = true;
+      autoUpdater.quitAndInstall();
+    });
+
     // Setup auto-updater
     if (!is.dev) {
       setupAutoUpdater();
