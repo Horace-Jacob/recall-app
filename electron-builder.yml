@@ -32,6 +32,8 @@ win:
 nsis:
   installerIcon: build/icon.ico
   uninstallerIcon: build/icon.ico
+  oneClick: false
+  allowToChangeInstallationDirectory: true
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   runAfterFinish: true
@@ -60,7 +62,7 @@ linux:
   category: Utility
 appImage:
   artifactName: ${name}-${version}.${ext}
-npmRebuild: false
+
 publish:
   - provider: github
     owner: Horace-Jacob

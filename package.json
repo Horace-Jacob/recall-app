@@ -6,7 +6,7 @@
   "author": "LON",
   "homepage": "https://electron-vite.org",
   "repository": {
-    "url": "https://github.com/Horace-Jacob/recall-app.git"
+    "url": "https://github.com/Horace-Jacob/recall-app"
   },
   "scripts": {
     "format": "prettier --write .",
@@ -23,6 +23,17 @@
     "build:win": "npm run build && electron-builder --win --publish always",
     "build:mac": "electron-vite build && electron-builder --mac",
     "build:linux": "electron-vite build && electron-builder --linux"
+  },
+  "build": {
+    "win": {
+      "publish": [
+        {
+          "provider": "github",
+          "owner": "Horace-Jacob",
+          "repo": "recall-app"
+        }
+      ]
+    }
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
