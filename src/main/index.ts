@@ -159,7 +159,7 @@ function createTray(): void {
       }
     }
   ]);
-  tray.setToolTip('Memory Layer');
+  tray.setToolTip('Recall');
   tray.setContextMenu(contextMenu);
 
   tray.on('double-click', () => {

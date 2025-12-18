@@ -2,7 +2,8 @@ import Database from 'better-sqlite3';
 import { IPCRequest, IPCResponse } from '../types';
 import * as net from 'net';
 
-const IPC_PORT = parseInt(import.meta.env.VITE_ELECTRON_BRIDGE_PORT || '12346', 10);
+// const IPC_PORT = parseInt(import.meta.env.VITE_ELECTRON_BRIDGE_PORT || '12346', 10);
+const IPC_PORT = parseInt('12346', 10);
 const MAX_REQUEST_BYTES = 12 * 1024 * 1024;
 
 type RequestHandler = (

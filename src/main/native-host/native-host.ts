@@ -15,7 +15,8 @@ import * as path from 'path';
 import * as net from 'net';
 
 const LOG_PATH = path.join(process.env.TEMP || process.env.TMPDIR || '/tmp', 'native-host.log');
-const IPC_PORT = parseInt(process.env.ELECTRON_BRIDGE_PORT || '12346', 10);
+const IPC_PORT = parseInt('12346', 10);
+// const IPC_PORT = parseInt(process.env.ELECTRON_BRIDGE_PORT || '12346', 10);
 
 // Limits and timeouts
 const MAX_MESSAGE_BYTES = 10 * 1024 * 1024; // 10MB
