@@ -66,7 +66,7 @@ declare global {
         onUpdateDownloadProgress: (callback: (progress: any) => void) => void;
         onUpdateDownloaded: (callback: (info: any) => void) => void;
         onUpdateError: (callback: (error: any) => void) => void;
-        quitAndInstallUpdate: () => void;
+        quitAndInstallUpdate: () => Promise<void>;
       };
     };
   }

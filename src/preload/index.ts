@@ -100,7 +100,7 @@ if (process.contextIsolated) {
           ipcRenderer.on('update-error', (_, err) => callback(err));
         },
         quitAndInstall: () => {
-          ipcRenderer.send('quit-and-install');
+          ipcRenderer.invoke('quit-and-install');
         }
       }
     });

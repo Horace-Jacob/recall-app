@@ -45,8 +45,8 @@ export function UpdateNotification() {
     });
   }, []);
 
-  const handleInstallUpdate = () => {
-    window.electronAPI.update.quitAndInstallUpdate?.();
+  const handleInstallUpdate = async () => {
+    await window.electronAPI.update.quitAndInstallUpdate();
   };
 
   const handleDismiss = () => {
@@ -140,7 +140,7 @@ export function UpdateNotification() {
             {/* Action buttons */}
             <div className="flex gap-2">
               <button
-                onClick={handleInstallUpdate}
+                onClick={() => handleInstallUpdate()}
                 className="flex-1 px-3 py-2 bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 text-sm font-medium rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all duration-200 flex items-center justify-center gap-2 group"
               >
                 <RefreshCw className="w-3.5 h-3.5 group-hover:rotate-180 transition-transform duration-500" />
