@@ -1,0 +1,70 @@
+appId: com.recall.app
+productName: recall-app
+directories:
+  buildResources: build
+  output: release
+
+files:
+  - out/**/*
+  - package.json
+
+extraResources:
+  - from: out/resources/native-host.exe
+    to: ../native-host.exe
+
+  - from: node_modules/better-sqlite3/build/Release
+    to: node_modules/better-sqlite3/build/Release
+    filter:
+      - '**/*'
+  - from: resources/icon.png
+    to: ../icon.png
+
+asarUnpack:
+  - resources/**
+  - node_modules/better-sqlite3/**
+
+win:
+  target:
+    - nsis
+  executableName: recall-app
+  icon: build/icon.ico
+
+nsis:
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+  artifactName: ${name}-${version}-setup.${ext}
+  shortcutName: ${productName}
+  runAfterFinish: true
+  uninstallDisplayName: ${productName}
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  include: build/installer.nsh
+  deleteAppDataOnUninstall: true
+
+mac:
+  entitlementsInherit: build/entitlements.mac.plist
+  extendInfo:
+    - NSCameraUsageDescription: Application requests access to the device's camera.
+    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
+    - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
+    - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
+  notarize: false
+dmg:
+  artifactName: ${name}-${version}.${ext}
+linux:
+  target:
+    - AppImage
+    - snap
+    - deb
+  maintainer: electronjs.org
+  category: Utility
+appImage:
+  artifactName: ${name}-${version}.${ext}
+npmRebuild: false
+publish:
+  - provider: github
+    owner: Horace-Jacob
+    repo: recall-app
+
+electronDownload:
+  mirror: https://npmmirror.com/mirrors/electron/
