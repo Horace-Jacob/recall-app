@@ -247,7 +247,7 @@ if (!gotTheLock) {
 
     ipcMain.on('quit-and-install', () => {
       isQuitting = true;
-      autoUpdater.quitAndInstall();
+      autoUpdater.quitAndInstall(false, true);
     });
 
     ipcMain.on('check-for-updates', () => {

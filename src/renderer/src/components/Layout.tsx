@@ -1,10 +1,10 @@
 import { useEffect, useState, type FC } from 'react';
 import { Outlet, Link } from 'react-router-dom';
-import { X, ChevronDown, LogOut, Settings, Sidebar as SidebarIcon, Chromium } from 'lucide-react';
+import { X, ChevronDown, LogOut, Settings, Sidebar as SidebarIcon } from 'lucide-react';
 import { Sidebar } from './sidebar/Sidebar';
 import { Loading } from './Loading';
 import { useAuth } from '@renderer/context/AuthContext';
-import { useShowOnboardBtn } from '@renderer/hooks/useShowOnboardBtn';
+// import { useShowOnboardBtn } from '@renderer/hooks/useShowOnboardBtn';
 import { UpdateNotification } from './UpdateNotification';
 
 export const Layout: FC = () => {
@@ -17,7 +17,7 @@ export const Layout: FC = () => {
   const [logoutLoading, setLogoutLoading] = useState<boolean>(false);
   const { session, loading, signOut } = useAuth();
 
-  const showImportButton = useShowOnboardBtn();
+  // const showImportButton = useShowOnboardBtn();
 
   useEffect(() => {
     setIsUserMenuOpen(false);
@@ -123,14 +123,14 @@ export const Layout: FC = () => {
 
                         {/* Menu Items */}
                         <div className="py-1">
-                          {showImportButton ? (
+                          {/* {showImportButton ? (
                             <Link to="/onboarding">
                               <button className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-foreground hover:bg-secondary transition-colors">
                                 <Chromium size={16} />
                                 <span>Onboarding</span>
                               </button>
                             </Link>
-                          ) : null}
+                          ) : null} */}
                           <Link to="/settings">
                             <button className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-foreground hover:bg-secondary transition-colors">
                               <Settings size={16} />
