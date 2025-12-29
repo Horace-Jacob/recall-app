@@ -150,7 +150,7 @@ export function UpdateNotification() {
                 onClick={handleDismiss}
                 className="px-4 py-2 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
               >
-                Later
+                Ok
               </button>
             </div>
           </div>
