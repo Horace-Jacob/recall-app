@@ -23,7 +23,7 @@ export const Sidebar: FC<SidebarProps> = ({ isOpen }) => {
 
   const menuItems: MenuItem[] = [
     { icon: Home, label: 'Home', path: '/' },
-    { icon: FileText, label: 'Add memories', path: '/new-memory' }
+    { icon: FileText, label: 'Add Memories', path: '/new-memory' }
     // { icon: FileText, label: 'Memory recall', path: '/memory-recall' }
   ];
 

@@ -1,6 +1,6 @@
 {
   "name": "memory-layer",
-  "version": "0.0.14",
+  "version": "0.1.0",
   "description": "Recall App",
   "main": "./out/main/index.js",
   "author": "LON",
