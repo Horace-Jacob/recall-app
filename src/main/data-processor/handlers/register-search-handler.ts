@@ -8,7 +8,7 @@ export function registerSearchHandlers(): void {
   ipcMain.handle('search:semanticSearch', async (_event, userId: string, query: string) => {
     try {
       const result = await semanticSearchWithCache(
-        path.join(app.getPath('userData'), 'recall.db'),
+        path.join(app.getPath('userData'), 'memory-layer.db'),
         userId,
         query
       );
@@ -24,7 +24,7 @@ export function registerSearchHandlers(): void {
 
   ipcMain.handle('search:getRecentSearches', async (_event, userId: string) => {
     try {
-      const db = new Database(path.join(app.getPath('userData'), 'recall.db'), {
+      const db = new Database(path.join(app.getPath('userData'), 'memory-layer.db'), {
         readonly: true
       });
 
@@ -55,7 +55,7 @@ export function registerSearchHandlers(): void {
   // Get search stats
   ipcMain.handle('search:getStats', async (_event, userId: string) => {
     try {
-      const stats = getSearchStats(path.join(app.getPath('userData'), 'recall.db'), userId);
+      const stats = getSearchStats(path.join(app.getPath('userData'), 'memory-layer.db'), userId);
       return { success: true, data: stats };
     } catch (error) {
       console.error('Get stats error:', error);

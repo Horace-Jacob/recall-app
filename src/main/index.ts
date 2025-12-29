@@ -83,7 +83,7 @@ if (!import.meta.env?.VITE_OPENAI_API_KEY) {
 }
 
 // constants
-const PROTOCOL_SCHEME = 'com.recall.app';
+const PROTOCOL_SCHEME = 'com.memory-layer.app';
 
 let mainWindow: BrowserWindow;
 let dbInstance: Database.Database;
@@ -107,7 +107,7 @@ function createWindow(): void {
     height: 820,
     show: false,
     autoHideMenuBar: true,
-    title: 'Recall',
+    title: 'Memory Layer',
     ...(process.platform === 'linux' ? { icon } : { icon }),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -160,7 +160,7 @@ function createTray(): void {
       }
     }
   ]);
-  tray.setToolTip('Recall');
+  tray.setToolTip('Memory Layer');
   tray.setContextMenu(contextMenu);
 
   tray.on('double-click', () => {
@@ -196,9 +196,9 @@ if (!gotTheLock) {
 
   // App Ready
   app.whenReady().then(() => {
-    electronApp.setAppUserModelId('com.recall.app');
+    electronApp.setAppUserModelId('com.memory-layer.app');
     // Database initiliazation
-    dbInstance = new Database(path.join(app.getPath('userData'), 'recall.db'));
+    dbInstance = new Database(path.join(app.getPath('userData'), 'memory-layer.db'));
 
     // Create Tray
     createTray();

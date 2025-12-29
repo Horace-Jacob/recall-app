@@ -174,7 +174,8 @@ export const DashboardPage: FC = () => {
                 </div>
 
                 {/* Summary */}
-                <div className="text-sm text-card-foreground mb-2 line-clamp-2">{item.summary}</div>
+                {/* <div className="text-sm text-card-foreground mb-2 line-clamp-2">{item.summary}</div> */}
+                <div className="text-sm text-card-foreground mb-2">{item.summary}</div>
 
                 {/* Metadata row */}
                 <div className="flex items-center gap-4 text-xs text-card-foreground">
