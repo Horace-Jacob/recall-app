@@ -1,5 +1,5 @@
 appId: com.memory-layer.app
-productName: memory-layer
+productName: Memory Layer
 directories:
   buildResources: build
   output: release
@@ -26,7 +26,7 @@ asarUnpack:
 win:
   target:
     - nsis
-  executableName: memory-layer
+  executableName: Memory Layer
   icon: build/icon.ico
 
 nsis:
