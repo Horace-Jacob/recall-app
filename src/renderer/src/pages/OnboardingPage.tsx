@@ -17,7 +17,7 @@ import {
   type LucideIcon
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { skipOnboarding } from '@renderer/services/onBoardingService';
+import { completeOnboarding, skipOnboarding } from '@renderer/services/onBoardingService';
 import { PROFILE_ID } from '@renderer/utils/constants';
 
 // Types
@@ -145,7 +145,6 @@ export const OnBoardingPage: FC = () => {
       setError('Please select at least one bookmark');
       return;
     }
-
     setCurrentStep('processing');
     // setProcessing(true);
     setError(null);
@@ -178,7 +177,9 @@ export const OnBoardingPage: FC = () => {
         // Small delay to show progress
         await new Promise((resolve) => setTimeout(resolve, 500));
       }
-
+      if (session) {
+        await completeOnboarding(session.user.id);
+      }
       setResult({
         successful,
         failed: failedUrls.length,
@@ -187,10 +188,11 @@ export const OnBoardingPage: FC = () => {
 
       setCurrentStep('complete');
 
-      // Auto-redirect after showing results
       setTimeout(() => {
         navigate('/');
       }, 5000);
+
+      // Auto-redirect after showing results
     } catch (err) {
       setError('Processing failed. Please try again.');
     } finally {

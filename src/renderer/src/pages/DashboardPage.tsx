@@ -1,11 +1,12 @@
 import { useEffect, useState, useRef, useCallback, type FC } from 'react';
-import { Timer, Globe2, Loader2, Trash2, RefreshCw } from 'lucide-react';
+import { Timer, Globe2, Loader2, Trash2, RefreshCw, Pencil } from 'lucide-react';
 import { timeAgo } from '@renderer/utils/utils';
 
 interface IMemory {
   id: number;
   title: string;
   summary: string;
+  intent?: string;
   url: string;
   createdAt?: string;
   source_type: string;
@@ -33,7 +34,7 @@ export const DashboardPage: FC = () => {
       setLoading(true);
       try {
         const rows: IMemory[] = (await window.electronAPI.db.query(
-          `SELECT id, title, summary, url, source_type, created_at as createdAt
+          `SELECT id, title, summary, url, intent, source_type, created_at as createdAt
          FROM memories
          ORDER BY created_at DESC
          LIMIT ${PAGE_SIZE} OFFSET ${currentOffset}`
@@ -63,7 +64,7 @@ export const DashboardPage: FC = () => {
 
     try {
       const rows: IMemory[] = (await window.electronAPI.db.query(
-        `SELECT id, title, summary, url, source_type, created_at as createdAt
+        `SELECT id, title, summary, url, intent, source_type, created_at as createdAt
          FROM memories
          ORDER BY created_at DESC
          LIMIT ${PAGE_SIZE} OFFSET 0`
@@ -199,6 +200,12 @@ export const DashboardPage: FC = () => {
                     <Globe2 className="w-3.5 h-3.5" />
                     <span className="truncate max-w-xs">{item.url}</span>
                   </div>
+                  {item.intent && (
+                    <div className="flex items-center gap-1.5">
+                      <Pencil className="w-3 h-3.5" />
+                      <span className="truncate max-w-xs">{item.intent}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

@@ -23,7 +23,7 @@ export const saveToDb = async (
     const current_time = Date.now();
     dbInstance
       .prepare(
-        `INSERT INTO memories (user_id, url, canonical_url, title, summary, embedding, content, created_at, source_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO memories (user_id, url, canonical_url, title, summary, intent, embedding, content, created_at, source_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .run(
         userId,
@@ -31,6 +31,7 @@ export const saveToDb = async (
         data.canonicalUrl,
         data.title!,
         summary,
+        data.intent || null,
         embeddingBuf,
         data.content!,
         current_time,

@@ -57,7 +57,8 @@ declare global {
       };
       ui: {
         processSingleUrl: (
-          url: string
+          url: string,
+          intent: string
         ) => Promise<{ success: boolean; message?: string; error?: string }>;
       };
       update: {

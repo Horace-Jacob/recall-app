@@ -9,7 +9,8 @@ import {
   Loader2,
   AlertCircle,
   Calendar,
-  BarChart3
+  BarChart3,
+  Pencil
 } from 'lucide-react';
 import { useAuth } from '@renderer/context/AuthContext';
 import { PROFILE_ID } from '@renderer/utils/constants';
@@ -19,6 +20,7 @@ interface SearchResult {
   url: string;
   title: string;
   summary: string;
+  intent: string | null;
   visitCount: number;
   createdAt: Date;
   similarity?: number;
@@ -272,6 +274,12 @@ export const SearchModal: FC<SearchModalProps> = ({ isOpen, onClose }) => {
                           <div className="flex items-center gap-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
                             <span>{Math.round(source.similarity * 100)}% match</span>
+                          </div>
+                        )}
+                        {source.intent && (
+                          <div className="flex items-center gap-1">
+                            <Pencil className="w-3 h-3" />
+                            <span>{source.intent}</span>
                           </div>
                         )}
                       </div>

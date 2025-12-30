@@ -1,5 +1,12 @@
 import { type FC, JSX, useState } from 'react';
-import { Loader2, Link as LinkIcon, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import {
+  Loader2,
+  Link as LinkIcon,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  Pencil
+} from 'lucide-react';
 
 interface ProcessingState {
   isProcessing: boolean;
@@ -10,6 +17,7 @@ interface ProcessingState {
 
 export const AddMemoryPage: FC = () => {
   const [url, setUrl] = useState('');
+  const [intent, setIntent] = useState<string>('');
   const [state, setState] = useState<ProcessingState>({
     isProcessing: false,
     stage: 'idle',
@@ -52,7 +60,7 @@ export const AddMemoryPage: FC = () => {
 
     try {
       // Call the electron API to process single URL
-      const result = await window.electronAPI.ui.processSingleUrl(url);
+      const result = await window.electronAPI.ui.processSingleUrl(url, intent);
 
       if (result.success) {
         setState({
@@ -65,6 +73,7 @@ export const AddMemoryPage: FC = () => {
         // Clear the input after success
         setTimeout(() => {
           setUrl('');
+          setIntent('');
           setState({
             isProcessing: false,
             stage: 'idle',
@@ -74,6 +83,7 @@ export const AddMemoryPage: FC = () => {
         }, 3000);
       } else {
         setUrl('');
+        setIntent('');
         setState({
           isProcessing: false,
           stage: 'error',
@@ -83,6 +93,7 @@ export const AddMemoryPage: FC = () => {
       }
     } catch (error) {
       setUrl('');
+      setIntent('');
       setState({
         isProcessing: false,
         stage: 'error',
@@ -137,6 +148,26 @@ export const AddMemoryPage: FC = () => {
       {/* Content */}
       <div className="max-w-3xl mx-auto px-12 py-12">
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <label htmlFor="intent" className="block text-sm font-medium text-card-foreground">
+              Why are you saving this? (Optional)
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Pencil className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                id="intent"
+                value={intent}
+                onChange={(e) => setIntent(e.target.value)}
+                placeholder="E.g., Research for project X"
+                disabled={state.isProcessing}
+                maxLength={50}
+                className="block w-full pl-10 pr-3 py-3 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent  disabled:cursor-not-allowed text-card-foreground bg-background"
+              />
+            </div>
+          </div>
           {/* URL Input */}
           <div className="space-y-2">
             <label htmlFor="url" className="block text-sm font-medium text-card-foreground">

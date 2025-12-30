@@ -28,6 +28,7 @@ export interface Processed {
   canonicalUrl?: string | null;
   title?: string;
   content?: string;
+  intent?: string | null;
   wordCount?: number;
   excerpt?: string;
   byline?: string;
@@ -102,6 +103,7 @@ export interface Memory {
   url: string;
   title: string;
   content: string;
+  intent: string | null;
   summary: string;
   embedding: Buffer;
   created_at: string;
@@ -113,6 +115,7 @@ export interface SearchResult {
   url: string;
   title: string;
   summary: string;
+  intent: string | null;
   visitCount: number | null;
   createdAt: Date;
   similarity: number;

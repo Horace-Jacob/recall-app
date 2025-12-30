@@ -81,7 +81,8 @@ if (process.contextIsolated) {
           ipcRenderer.invoke('search:getRecentSearches', userId)
       },
       ui: {
-        processSingleUrl: (url: string) => ipcRenderer.invoke('process-single-url', url)
+        processSingleUrl: (url: string, intent: string) =>
+          ipcRenderer.invoke('process-single-url', url, intent)
       },
       update: {
         checkForUpdates: () => {

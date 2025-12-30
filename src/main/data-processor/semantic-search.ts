@@ -65,7 +65,7 @@ function searchSimilarMemories(
 ): RankedMemory[] {
   const stmt = db.prepare(`
     SELECT
-      id, url, title, content, summary, embedding, created_at, source_type
+      id, url, title, content, summary, intent, embedding, created_at, source_type
     FROM memories
     WHERE user_id = ?
   `);
@@ -208,6 +208,7 @@ function formatSource(memory: RankedMemory): SearchResult {
     id: memory.id.toString(),
     url: memory.url,
     title: memory.title,
+    intent: memory.intent,
     summary: memory.summary,
     visitCount: null,
     createdAt: new Date(memory.created_at),

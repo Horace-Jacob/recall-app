@@ -79,6 +79,7 @@ export const checkAndSyncOnboarding = async (userId: string): Promise<Onboarding
 export const completeOnboarding = async (
   userId: string
 ): Promise<{ success: boolean; message: string }> => {
+  console.log('Completing onboarding for user:', userId);
   const { data: canImport, error } = await supabase.rpc('lock_history_import');
   if (error) {
     return { success: false, message: `Failed to verify import ${error.message}` };
@@ -95,6 +96,7 @@ export const completeOnboarding = async (
     };
     window.electronAPI.local.updateLocalSetting(setting);
     await supabase.from('profiles').update({ has_completed_onboarding: true }).eq('id', userId);
+    console.log('Onboarding completed for user:', userId);
     return { success: true, message: 'History imported successfully' };
   } catch (error) {
     console.error('Import failed', error);

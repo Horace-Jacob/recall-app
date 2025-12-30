@@ -12,6 +12,7 @@ export const createMemoriesTable = (dbInstance: Database.Database): void => {
         title TEXT,
         content TEXT DEFAULT NULL,
         summary TEXT,
+        intent TEXT DEFAULT NULL,
         embedding BLOB DEFAULT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         source_type TEXT DEFAULT NULL

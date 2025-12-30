@@ -7,8 +7,13 @@ import Database from 'better-sqlite3';
 import { saveToDb } from '../../database/savedb';
 import { Worker } from 'worker_threads';
 
+const checkIntent = (intent: string): string | null => {
+  const trimmed = intent.trim();
+  return trimmed.length > 0 ? intent : null;
+};
+
 export const registerSingleUrlHandler = (dbInstance: Database.Database): void => {
-  ipcMain.handle('process-single-url', async (_event, url: string) => {
+  ipcMain.handle('process-single-url', async (_event, url: string, intent: string) => {
     try {
       // Create a mock history entry for the single URL
       const mockEntry: BrowserHistoryEntry = {
@@ -19,6 +24,8 @@ export const registerSingleUrlHandler = (dbInstance: Database.Database): void =>
       };
 
       const canonicalUrl = canonicalizeUrl(url);
+
+      const intentChecked = checkIntent(intent);
 
       // Check if URL is blocked
       const filtered = applyBlocklist([mockEntry]);
@@ -66,7 +73,8 @@ export const registerSingleUrlHandler = (dbInstance: Database.Database): void =>
                 url: url,
                 canonicalUrl,
                 title: result.title || 'Untitled',
-                content: result.content.content
+                content: result.content.content,
+                intent: intentChecked
               },
               'manual',
               userId
