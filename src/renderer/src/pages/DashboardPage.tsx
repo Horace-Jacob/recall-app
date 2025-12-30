@@ -202,8 +202,8 @@ export const DashboardPage: FC = () => {
                   </div>
                   {item.intent && (
                     <div className="flex items-center gap-1.5">
-                      <Pencil className="w-3 h-3.5" />
-                      <span className="truncate max-w-xs">{item.intent}</span>
+                      <Pencil className="w-3.5 h-3.5" />
+                      <span className="truncate max-w-52">{item.intent}</span>
                     </div>
                   )}
                 </div>
