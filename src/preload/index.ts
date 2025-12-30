@@ -102,6 +102,25 @@ if (process.contextIsolated) {
         quitAndInstall: () => {
           ipcRenderer.invoke('quit-and-install');
         }
+      },
+      bookmark: {
+        getAvailableBrowsers: () => {
+          return ipcRenderer.invoke('get-available-browsers');
+        },
+
+        /**
+         * Get bookmarks from a specific browser
+         */
+        getBookmarks: (browserId: string) => {
+          return ipcRenderer.invoke('get-bookmarks', browserId);
+        },
+
+        /**
+         * Process a single bookmark URL
+         */
+        processBookmark: (url: string, userId: string) => {
+          return ipcRenderer.invoke('process-bookmark', url, userId);
+        }
       }
     });
   } catch (error) {

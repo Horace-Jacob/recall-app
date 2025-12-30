@@ -68,6 +68,12 @@ declare global {
         onUpdateError: (callback: (error: any) => void) => void;
         quitAndInstallUpdate: () => Promise<void>;
       };
+      bookmark: {
+        getAvailableBrowsers: () => Promise<BrowserInfo[]>;
+        getBookmarks: (browserId: string) => Promise<BookmarkData[]>;
+
+        processBookmark: (url: string, userId: string) => Promise<void>;
+      };
     };
   }
 }

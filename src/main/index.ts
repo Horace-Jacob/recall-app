@@ -18,6 +18,7 @@ import { registerSearchHandlers } from './data-processor/handlers/register-searc
 import 'dotenv/config';
 import { registerSingleUrlHandler } from './data-processor/handlers/register-single-url-handler';
 import { autoUpdater } from 'electron-updater';
+import { registerOnboardingHandlers } from './data-processor/handlers/register-onboarding-handler';
 
 log.transports.file.level = 'info';
 
@@ -219,6 +220,7 @@ if (!gotTheLock) {
     registerHistoryProcessorHandler(dbInstance);
     registerSearchHandlers();
     registerSingleUrlHandler(dbInstance);
+    registerOnboardingHandlers(dbInstance);
 
     // Handle deep links
     app.on('open-url', (event, url) => {
