@@ -276,12 +276,11 @@ export const SearchModal: FC<SearchModalProps> = ({ isOpen, onClose }) => {
                             <span>{Math.round(source.similarity * 100)}% match</span>
                           </div>
                         )}
-                        {source.intent && (
-                          <div className="flex items-center gap-1">
-                            <Pencil className="w-3 h-3" />
-                            <span>{source.intent}</span>
-                          </div>
-                        )}
+
+                        <div className="flex items-center gap-1">
+                          <Pencil className="w-3 h-3" />
+                          <span>{source.intent ? source.intent : 'No context added yet'}</span>
+                        </div>
                       </div>
                     </div>
                   ))}

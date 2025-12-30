@@ -200,12 +200,13 @@ export const DashboardPage: FC = () => {
                     <Globe2 className="w-3.5 h-3.5" />
                     <span className="truncate max-w-xs">{item.url}</span>
                   </div>
-                  {item.intent && (
-                    <div className="flex items-center gap-1.5">
-                      <Pencil className="w-3.5 h-3.5" />
-                      <span className="truncate max-w-52">{item.intent}</span>
-                    </div>
-                  )}
+
+                  <div className="flex items-center gap-1.5">
+                    <Pencil className="w-3.5 h-3.5" />
+                    <span className="truncate max-w-52">
+                      {item.intent ? item.intent : 'No context added yet'}
+                    </span>
+                  </div>
                 </div>
               </div>
             ))}
