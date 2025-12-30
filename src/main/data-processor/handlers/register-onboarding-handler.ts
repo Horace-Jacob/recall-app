@@ -71,7 +71,6 @@ export function registerOnboardingHandlers(dbInstance: Database.Database): void 
       const bookmarks = await parseBookmarks(browserId, bookmarksPath);
       return bookmarks;
     } catch (error) {
-      console.error(`Error loading bookmarks from ${browserId}:`, error);
       throw error;
     }
   });
@@ -83,7 +82,6 @@ export function registerOnboardingHandlers(dbInstance: Database.Database): void 
 
       await processBookmarkWithAI(url, userId, dbInstance);
     } catch (error) {
-      console.error(`Error processing bookmark ${url}:`, error);
       throw error;
     }
   });
@@ -107,7 +105,6 @@ async function isBrowserInstalled(browserId: string): Promise<boolean> {
 
     return false;
   } catch (error) {
-    console.error(`Error checking browser installation for ${browserId}:`, error);
     return false;
   }
 }
@@ -293,7 +290,6 @@ async function parseBookmarks(browserId: string, bookmarksPath: string): Promise
 
     return bookmarks;
   } catch (error) {
-    console.error(`Error parsing bookmarks for ${browserId}:`, error);
     throw new Error(`Failed to parse bookmarks from ${browserId}`);
   }
 }
