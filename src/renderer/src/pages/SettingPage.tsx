@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, ChevronRight, ArrowLeft, DownloadCloud } from 'lucide-react';
+import { User, ChevronRight, ArrowLeft, DownloadCloud, ExternalLink, Puzzle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@renderer/context/AuthContext';
 import { Loading } from '@renderer/components/Loading';
@@ -52,6 +52,37 @@ const SettingsPage: React.FC = () => {
                     </div>
                   </div>
                   <ChevronRight className="w-5 h-5 text-foreground" />
+                </div>
+              </div>
+            </section>
+
+            <section className="mb-10">
+              <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
+                Browser Extension
+              </h2>
+
+              <div className="bg-background border border-border rounded-lg hover:bg-secondary transition-colors">
+                <div className="p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                      <Puzzle className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Chrome Extension</p>
+                      <p className="text-sm text-secondary-foreground">
+                        Save pages with one click while browsing
+                      </p>
+                    </div>
+                  </div>
+                  <a
+                    href="https://chromewebstore.google.com/detail/memory-layer/jkoekcdligppajejbhfofemcjnbhljik"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                  >
+                    Install
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
                 </div>
               </div>
             </section>

@@ -1,10 +1,11 @@
 {
   "name": "memory-layer",
-  "version": "0.1.4",
-  "description": "Recall App",
+  "version": "0.1.5",
+  "description": "Memory Layer Desktop App",
   "main": "./out/main/index.js",
   "author": "LON",
-  "homepage": "https://electron-vite.org",
+  "license": "MIT",
+  "homepage": "https://recall-landing-page-orpin.vercel.app/",
   "repository": {
     "url": "https://github.com/Horace-Jacob/recall-app"
   },
@@ -21,6 +22,7 @@
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "npm run build && electron-builder --win --publish always",
+    "build:winlocal": "npm run build && electron-builder --win",
     "build:mac": "electron-vite build && electron-builder --mac",
     "build:linux": "electron-vite build && electron-builder --linux"
   },

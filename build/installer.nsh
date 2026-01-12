@@ -12,11 +12,11 @@
 
   # Define variables
   !define HOST_NAME "com.recall.native_host"
-  !define EXTENSION_ID "lbifhofknjbeolifhcbdgfkejbejdmke"
+  !define EXTENSION_ID "jkoekcdligppajejbhfofemcjnbhljik"
 
   # Get AppData path
   ReadEnvStr $0 APPDATA
-  StrCpy $1 "$0\recall-app"
+  StrCpy $1 "$0\memory-layer"
 
   # Create directory
   CreateDirectory "$1"
@@ -31,7 +31,7 @@
   # Write JSON
   FileWrite $2 '{$\r$\n'
   FileWrite $2 '  "name": "${HOST_NAME}",$\r$\n'
-  FileWrite $2 '  "description": "Recall Desktop Native Messaging Host",$\r$\n'
+  FileWrite $2 '  "description": "Memory Layer Desktop Native Messaging Host",$\r$\n'
   FileWrite $2 '  "path": "$3",$\r$\n'
   FileWrite $2 '  "type": "stdio",$\r$\n'
   FileWrite $2 '  "allowed_origins": [$\r$\n'
@@ -62,7 +62,7 @@
 
   # Remove manifest file
   ReadEnvStr $0 APPDATA
-  Delete "$0\recall-app\native-host-manifest.json"
+  Delete "$0\memory-layer\native-host-manifest.json"
 
   DetailPrint "Native messaging host unregistered"
 
