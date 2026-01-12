@@ -139,10 +139,23 @@ function createWindow(): void {
   }
 }
 
+// Get the correct icon path for both dev and production
+function getIconPath(): string {
+  if (app.isPackaged) {
+    // Production: icon is in the app installation directory
+    // process.resourcesPath points to app.asar, go up one level to app folder
+    return path.join(path.dirname(process.resourcesPath), 'icon.png');
+  } else {
+    // Development: icon is in resources folder
+    return path.join(__dirname, '../../resources/icon.png');
+  }
+}
+
 // tray icon
 function createTray(): void {
   // Implementation for tray icon can be added here
-  const trayIcon = nativeImage.createFromPath(icon).resize({ width: 16, height: 16 });
+  const iconPath = getIconPath();
+  const trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
   tray = new Tray(trayIcon);
   const contextMenu = Menu.buildFromTemplate([
     {
