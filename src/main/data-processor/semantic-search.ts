@@ -6,22 +6,26 @@ const CONFIG = {
   TOP_K_RESULTS: 50,
   MAX_RESULTS_TO_USER: 5,
 
-  MIN_SIMILARITY: 0.3, // ← Moderate (was 0.25 in my fix, 0.4 original)
-  WEAK_MATCH_THRESHOLD: 0.42, // ← Conservative (was 0.35 in my fix, 0.5 original)
-  CONFIDENT_MATCH_THRESHOLD: 0.68, // ← Still lower than 0.75, but higher than 0.65
+  MIN_SIMILARITY: 0.3,
+  WEAK_MATCH_THRESHOLD: 0.42,
+  CONFIDENT_MATCH_THRESHOLD: 0.68,
 
   SIMILARITY_WEIGHT: 0.7,
-  RECENCY_WEIGHT: 0.25, // ← Middle ground
-  RECENCY_DECAY_DAYS: 60 // ← Middle ground
+  RECENCY_WEIGHT: 0.25,
+  RECENCY_DECAY_DAYS: 60
 };
 
 const AI_GATE = {
-  // Max sources to send to AI
-  MAX_SOURCES_FOR_AI: 5
+  MAX_SOURCES_FOR_AI: 5,
+
+  // New: Similarity thresholds for different query types
+  PERFECT_MATCH_THRESHOLD: 0.9, // Skip AI only if near-perfect match
+  NAVIGATIONAL_THRESHOLD: 0.7, // Lower bar for "find that article" queries
+  DEFAULT_THRESHOLD: 0.75 // Default for other queries
 };
 
 // ============================================================================
-// VECTOR OPERATIONS
+// VECTOR OPERATIONS (unchanged)
 // ============================================================================
 
 function bufferToEmbedding(buffer: Buffer): number[] {
@@ -55,7 +59,7 @@ function cosineSimilarity(a: number[], b: number[]): number {
 }
 
 // ============================================================================
-// VECTOR SIMILARITY SEARCH
+// VECTOR SIMILARITY SEARCH (unchanged)
 // ============================================================================
 
 function searchSimilarMemories(
@@ -81,32 +85,26 @@ function searchSimilarMemories(
 
   for (const memory of memories) {
     try {
-      // Skip if no embedding
       if (!memory.embedding) {
         continue;
       }
 
       const memoryEmbedding = bufferToEmbedding(memory.embedding);
 
-      // Check dimension mismatch
       if (memoryEmbedding.length !== queryEmbedding.length) {
         continue;
       }
 
-      // Calculate similarity
       const similarity = cosineSimilarity(queryEmbedding, memoryEmbedding);
 
-      // Skip if below minimum threshold
       if (similarity < CONFIG.MIN_SIMILARITY) {
         continue;
       }
 
-      // Calculate recency score (exponential decay)
       const createdAt = new Date(memory.created_at).getTime();
       const daysSince = (now - createdAt) / (1000 * 60 * 60 * 24);
       const recencyScore = Math.exp(-daysSince / CONFIG.RECENCY_DECAY_DAYS);
 
-      // Calculate final score (weighted combination)
       const finalScore =
         similarity * CONFIG.SIMILARITY_WEIGHT + recencyScore * CONFIG.RECENCY_WEIGHT;
 
@@ -121,14 +119,13 @@ function searchSimilarMemories(
     }
   }
 
-  // Sort by final score and return top K
   results.sort((a, b) => b.finalScore - a.finalScore);
 
   return results.slice(0, CONFIG.TOP_K_RESULTS);
 }
 
 // ============================================================================
-// SMART DEDUPLICATION (Only if titles are very similar)
+// SMART DEDUPLICATION (unchanged)
 // ============================================================================
 
 function calculateTitleSimilarity(title1: string, title2: string): number {
@@ -155,14 +152,12 @@ function deduplicateResults(memories: RankedMemory[]): RankedMemory[] {
   const kept: RankedMemory[] = [];
 
   for (const memory of memories) {
-    // Check if this memory is a duplicate of any kept memory
     const isDuplicate = kept.some((existing) => {
-      // Same domain AND very similar title = duplicate
       try {
         const sameDomain = new URL(memory.url).hostname === new URL(existing.url).hostname;
         const titleSimilarity = calculateTitleSimilarity(memory.title, existing.title);
 
-        return sameDomain && titleSimilarity > 0.8; // 80% title overlap
+        return sameDomain && titleSimilarity > 0.8;
       } catch {
         return false;
       }
@@ -177,30 +172,122 @@ function deduplicateResults(memories: RankedMemory[]): RankedMemory[] {
 }
 
 // ============================================================================
-// SYNTHESIS INTENT DETECTION
+// QUERY INTENT DETECTION (NEW & IMPROVED)
 // ============================================================================
 
-function hasSynthesisIntent(query: string): boolean {
+interface QueryIntent {
+  type: 'question' | 'synthesis' | 'navigational' | 'general';
+  needsAIAnswer: boolean;
+  confidence: 'high' | 'medium' | 'low';
+}
+
+function analyzeQueryIntent(
+  query: string,
+  topResult: RankedMemory,
+  deduped: RankedMemory[]
+): QueryIntent {
+  const lowerQuery = query.toLowerCase().trim();
+
+  // ========================================
+  // 1. QUESTION DETECTION
+  // ========================================
+  const questionWords = ['who', 'what', 'when', 'where', 'why', 'how', 'which', 'whose'];
+  const hasQuestionWord = questionWords.some((word) =>
+    new RegExp(`\\b${word}\\b`).test(lowerQuery)
+  );
+  const hasQuestionMark = query.includes('?');
+
+  // ========================================
+  // 2. SYNTHESIS DETECTION
+  // ========================================
   const synthesisKeywords = [
     'compare',
+    'comparison',
     'difference between',
+    'vs',
+    'versus',
     'pros and cons',
     'tradeoff',
-    'summarize all',
-    'summarize', // ← ADD THIS
+    'tradeoffs',
+    'summarize',
+    'summary',
+    'overview',
     'synthesize',
     'connect',
-    'what did i learn', // ← ADD THIS TOO
-    'tell me about' // ← AND THIS
+    'relationship between',
+    'what did i learn',
+    'tell me about',
+    'explain'
   ];
+  const hasSynthesisIntent = synthesisKeywords.some((keyword) => lowerQuery.includes(keyword));
 
-  const lowerQuery = query.toLowerCase();
+  // ========================================
+  // 3. NAVIGATIONAL DETECTION
+  // ========================================
+  const navigationalKeywords = [
+    'find',
+    'show me',
+    'get',
+    'open',
+    'article about',
+    'page about',
+    'link to',
+    'where is',
+    'do i have'
+  ];
+  const isNavigational = navigationalKeywords.some((keyword) => lowerQuery.includes(keyword));
 
-  return synthesisKeywords.some((keyword) => lowerQuery.includes(keyword));
+  // ========================================
+  // 4. DECISION LOGIC
+  // ========================================
+
+  // CASE 1: It's a direct question
+  if (hasQuestionWord || hasQuestionMark) {
+    // Only skip AI if it's a near-perfect match AND not asking for synthesis
+    const skipAI = topResult.similarity >= AI_GATE.PERFECT_MATCH_THRESHOLD && !hasSynthesisIntent;
+
+    return {
+      type: 'question',
+      needsAIAnswer: !skipAI,
+      confidence: topResult.similarity >= 0.75 ? 'high' : 'medium'
+    };
+  }
+
+  // CASE 2: It's a synthesis request
+  if (hasSynthesisIntent) {
+    // Always use AI for synthesis (unless perfect single match)
+    const skipAI = topResult.similarity >= AI_GATE.PERFECT_MATCH_THRESHOLD && deduped.length === 1;
+
+    return {
+      type: 'synthesis',
+      needsAIAnswer: !skipAI,
+      confidence: deduped.length >= 2 ? 'high' : 'medium'
+    };
+  }
+
+  // CASE 3: It's navigational (just wants the article)
+  if (isNavigational) {
+    const skipAI = topResult.similarity >= AI_GATE.NAVIGATIONAL_THRESHOLD;
+
+    return {
+      type: 'navigational',
+      needsAIAnswer: !skipAI,
+      confidence: topResult.similarity >= 0.7 ? 'high' : 'medium'
+    };
+  }
+
+  // CASE 4: General query - use similarity threshold
+  const skipAI = topResult.similarity >= AI_GATE.DEFAULT_THRESHOLD;
+
+  return {
+    type: 'general',
+    needsAIAnswer: !skipAI,
+    confidence: topResult.similarity >= 0.75 ? 'high' : 'medium'
+  };
 }
 
 // ============================================================================
-// FORMAT RESULTS
+// FORMAT RESULTS (unchanged)
 // ============================================================================
 
 function formatSource(memory: RankedMemory): SearchResult {
@@ -239,7 +326,7 @@ function formatWeakMatchResponse(query: string, memories: RankedMemory[]): AIRes
 }
 
 // ============================================================================
-// MAIN SEARCH FUNCTION
+// MAIN SEARCH FUNCTION (REFACTORED)
 // ============================================================================
 
 async function semanticSearch(dbPath: string, userId: string, query: string): Promise<AIResponse> {
@@ -275,11 +362,7 @@ async function semanticSearch(dbPath: string, userId: string, query: string): Pr
     // STEP 4: Deduplicate results
     // ========================================
     const deduped = deduplicateResults(ranked);
-
     const topResult = deduped[0];
-    const secondResult = deduped[1];
-
-    const dominance = secondResult ? topResult.similarity - secondResult.similarity : 1;
 
     // ========================================
     // STEP 5: Handle weak matches
@@ -289,70 +372,48 @@ async function semanticSearch(dbPath: string, userId: string, query: string): Pr
     }
 
     // ========================================
-    // STEP 6: Check if we need AI synthesis
+    // STEP 6: Analyze query intent (NEW!)
     // ========================================
-    const synthesisIntent = hasSynthesisIntent(query);
-    const HARD_NO_AI =
-      topResult.similarity >= CONFIG.CONFIDENT_MATCH_THRESHOLD && dominance >= 0.08;
-    const isConfidentMatch =
-      topResult.similarity >= CONFIG.CONFIDENT_MATCH_THRESHOLD &&
-      (!secondResult || topResult.similarity - secondResult.similarity >= 0.08);
-
-    // Decision: Use AI or not?
-    // const shouldUseAI =
-    //   !HARD_NO_AI &&
-    //   // Medium similarity ambiguity
-    //   ((topResult.similarity >= 0.55 && topResult.similarity <= 0.75) ||
-    //     // Multiple close results → synthesis helps
-    //     dominance < 0.05 ||
-    //     // Explicit synthesis request AND not confident
-    //     (synthesisIntent && topResult.similarity < CONFIG.CONFIDENT_MATCH_THRESHOLD));
-
-    const shouldUseAI =
-      !HARD_NO_AI &&
-      // ONLY use AI if explicit synthesis request
-      ((synthesisIntent && deduped.length >= 2) ||
-        // OR ambiguous results (multiple close matches)
-        (deduped.length >= 3 && secondResult && dominance < 0.05) ||
-        // OR medium similarity with multiple results (needs interpretation)
-        (topResult.similarity >= 0.42 && topResult.similarity <= 0.65 && deduped.length >= 3));
+    const intent = analyzeQueryIntent(query, topResult, deduped);
 
     // ========================================
-    // STEP 7A: High confidence, no synthesis needed
+    // STEP 7: Decide whether to use AI
     // ========================================
-    if (isConfidentMatch && !synthesisIntent) {
-      return formatRecallOnlyResponse(deduped);
-    }
+
+    // Check for ambiguous results (multiple close matches)
+    const secondResult = deduped[1];
+    const dominance = secondResult ? topResult.similarity - secondResult.similarity : 1;
+    const hasAmbiguousResults = deduped.length >= 3 && secondResult && dominance < 0.05;
+
+    // Final decision
+    const shouldUseAI = intent.needsAIAnswer || hasAmbiguousResults;
 
     // ========================================
-    // STEP 7B: Use AI to synthesize answer
+    // STEP 8A: Use AI to generate answer
     // ========================================
     if (shouldUseAI) {
       const aiMemories = deduped.slice(0, AI_GATE.MAX_SOURCES_FOR_AI);
       const { answer, sourceIndices } = await generateAIAnswer(query, aiMemories);
-      const sources = sourceIndices.map((index) => formatSource(aiMemories[index]));
 
-      // If AI didn't cite any sources, use top results
-      if (sources.length === 0) {
+      // If AI didn't cite any sources, fall back to recall-only
+      if (sourceIndices.length === 0) {
         return formatRecallOnlyResponse(deduped);
       }
+
+      const sources = sourceIndices.map((index) => formatSource(aiMemories[index]));
+
       return {
         answer,
         sources,
-        confidence: topResult.similarity >= CONFIG.CONFIDENT_MATCH_THRESHOLD ? 'high' : 'medium',
+        confidence: intent.confidence,
         usedAI: true
       };
     }
 
     // ========================================
-    // STEP 7C: Medium confidence, no AI needed
+    // STEP 8B: Return sources without AI
     // ========================================
-    return {
-      answer: "Here's what I found in your saved articles:",
-      sources: deduped.slice(0, CONFIG.MAX_RESULTS_TO_USER).map(formatSource),
-      confidence: 'medium',
-      usedAI: false
-    };
+    return formatRecallOnlyResponse(deduped);
   } catch (error) {
     console.error('❌ Search error:', error);
     throw error;
@@ -362,7 +423,7 @@ async function semanticSearch(dbPath: string, userId: string, query: string): Pr
 }
 
 // ============================================================================
-// HELPER: Get Search Stats
+// HELPER: Get Search Stats (unchanged)
 // ============================================================================
 
 export function getSearchStats(
@@ -471,7 +532,7 @@ export const semanticSearchWithCache = async (
       query,
       JSON.stringify(result),
       result.sources[0]?.similarity ?? 0,
-      result.answer !== 'Here’s what I found in your saved articles' ? 1 : 0,
+      result.usedAI ? 1 : 0,
       memorySnapshot
     );
 

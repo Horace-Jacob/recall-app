@@ -10,7 +10,7 @@ import { UpdateNotification } from './UpdateNotification';
 export const Layout: FC = () => {
   // const sidebarToggle = localStorage.getItem('isSidebarOpen');
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
-    return localStorage.getItem('isSidebarOpen') === 'true';
+    return true ? localStorage.getItem('isSidebarOpen') === 'true' : false;
   });
 
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
