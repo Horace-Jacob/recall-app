@@ -325,6 +325,34 @@ function formatWeakMatchResponse(query: string, memories: RankedMemory[]): AIRes
   };
 }
 
+async function fetchWithTimeout(url: string, timeout: number): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
+  }
+}
+
+async function checkInternetConnection(): Promise<boolean> {
+  try {
+    const response = await fetchWithTimeout('https://www.google.com', 5000);
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
 // ============================================================================
 // MAIN SEARCH FUNCTION (REFACTORED)
 // ============================================================================
@@ -334,6 +362,15 @@ async function semanticSearch(dbPath: string, userId: string, query: string): Pr
 
   try {
     db = new Database(dbPath, { readonly: true });
+    let isOnline = await checkInternetConnection();
+    if (!isOnline) {
+      return {
+        answer: 'Please check your internet connection.',
+        sources: [],
+        confidence: undefined,
+        usedAI: false
+      };
+    }
 
     // ========================================
     // STEP 1: Generate query embedding
@@ -513,28 +550,30 @@ export const semanticSearchWithCache = async (
     // ==================================================
     // 3. STORE RESULT
     // ==================================================
-    db.prepare(
+    if (result.confidence !== undefined) {
+      db.prepare(
+        `
+        INSERT OR REPLACE INTO recent_searches (
+          user_id,
+          normalized_query,
+          original_query,
+          response_json,
+          top_similarity,
+          used_ai,
+          memory_snapshot_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?)
       `
-      INSERT OR REPLACE INTO recent_searches (
-        user_id,
-        normalized_query,
-        original_query,
-        response_json,
-        top_similarity,
-        used_ai,
-        memory_snapshot_at
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `
-    ).run(
-      userId,
-      normalizedQuery,
-      query,
-      JSON.stringify(result),
-      result.sources[0]?.similarity ?? 0,
-      result.usedAI ? 1 : 0,
-      memorySnapshot
-    );
+      ).run(
+        userId,
+        normalizedQuery,
+        query,
+        JSON.stringify(result),
+        result.sources[0]?.similarity ?? 0,
+        result.usedAI ? 1 : 0,
+        memorySnapshot
+      );
+    }
 
     return result;
   } finally {
