@@ -1,5 +1,13 @@
 import React from 'react';
-import { User, ChevronRight, ArrowLeft, DownloadCloud, ExternalLink, Puzzle } from 'lucide-react';
+import {
+  User,
+  ChevronRight,
+  ArrowLeft,
+  DownloadCloud,
+  ExternalLink,
+  Puzzle,
+  MessageCircle
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@renderer/context/AuthContext';
 import { Loading } from '@renderer/components/Loading';
@@ -10,6 +18,11 @@ const SettingsPage: React.FC = () => {
   const checkForUpdates = (): void => {
     // Implement update check logic here
     window.electronAPI.update.checkForUpdates();
+  };
+
+  const openFeedbackForm = (): void => {
+    // Implement feedback form logic here
+    window.open('https://forms.gle/XSqBeRTQ6GkVYXVv5', '_blank');
   };
 
   return (
@@ -34,6 +47,31 @@ const SettingsPage: React.FC = () => {
 
           {/* Content */}
           <div className="max-w-4xl mx-auto px-6 py-8">
+            <section className="mb-10">
+              <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
+                Help
+              </h2>
+
+              <div
+                className="bg-background border border-border rounded-lg hover:bg-secondary transition-colors"
+                onClick={() => {
+                  openFeedbackForm();
+                }}
+              >
+                <div className="p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                      <MessageCircle className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Feedback</p>
+                      {/*<p className="text-sm text-secondary-foreground">support@yourapp.com</p>*/}
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-foreground" />
+                </div>
+              </div>
+            </section>
             {/* Account Section */}
             <section className="mb-10">
               <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
