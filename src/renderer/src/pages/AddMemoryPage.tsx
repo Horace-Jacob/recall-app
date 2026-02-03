@@ -7,6 +7,8 @@ import {
   AlertCircle,
   Pencil
 } from 'lucide-react';
+import { useAuth } from '@renderer/context/AuthContext';
+import { saveArticle } from '@renderer/lib/supabase';
 
 interface ProcessingState {
   isProcessing: boolean;
@@ -24,9 +26,12 @@ export const AddMemoryPage: FC = () => {
     message: '',
     progress: 0
   });
+  const { session } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
+    if (!session?.user.id) return;
     e.preventDefault();
+    await saveArticle(session.user.id); // Track save article activity
 
     if (!url.trim()) {
       setState({

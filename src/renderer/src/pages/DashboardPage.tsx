@@ -1,6 +1,9 @@
 import { useEffect, useState, useRef, useCallback, type FC } from 'react';
 import { Timer, Globe2, Loader2, Trash2, RefreshCw, Pencil } from 'lucide-react';
 import { timeAgo } from '@renderer/utils/utils';
+import { useAuth } from '@renderer/context/AuthContext';
+import { trackAppOpen } from '@renderer/lib/supabase';
+import { useActivityTracking } from '@renderer/hooks/useActivityTracking';
 
 interface IMemory {
   id: number;
@@ -20,8 +23,10 @@ export const DashboardPage: FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
+  const { session } = useAuth();
 
   const observerTarget = useRef<HTMLDivElement>(null);
+  useActivityTracking();
 
   const openLink = (url: string): void => {
     window.open(url, '_blank');
@@ -85,6 +90,11 @@ export const DashboardPage: FC = () => {
 
   // Initial load
   useEffect(() => {
+    if (!session?.user.id) return;
+    const appOpen = async () => {
+      await trackAppOpen(session.user.id);
+    };
+    appOpen();
     fetchMemories(0);
   }, []);
 

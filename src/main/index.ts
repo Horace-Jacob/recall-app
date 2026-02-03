@@ -86,7 +86,7 @@ if (!import.meta.env?.VITE_OPENAI_API_KEY) {
 // constants
 const PROTOCOL_SCHEME = 'com.memory-layer.app';
 
-let mainWindow: BrowserWindow;
+export let mainWindow: BrowserWindow;
 let dbInstance: Database.Database;
 let tray: Tray;
 let isQuitting = false;

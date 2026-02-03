@@ -69,6 +69,10 @@ declare global {
         onUpdateError: (callback: (error: any) => void) => void;
         quitAndInstallUpdate: () => Promise<void>;
       };
+      track: {
+        onSavedArticle: (callback: (data: any) => void) => void;
+        removeArticleSavedListener: () => void;
+      };
       bookmark: {
         getAvailableBrowsers: () => Promise<BrowserInfo[]>;
         getBookmarks: (browserId: string) => Promise<BookmarkData[]>;

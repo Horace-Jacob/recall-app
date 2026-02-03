@@ -5,6 +5,7 @@ import { PROFILE_ID } from '../constants';
 import { IPCRequest, IPCResponse } from '../types';
 import { canonicalizeUrl, findByCanonicalUrl, timeAgo } from '../utils';
 import Database from 'better-sqlite3';
+import { mainWindow } from '../index';
 
 const sanitizeContentSingleLine = (s: string): string => {
   if (!s) return '';
@@ -102,6 +103,9 @@ export const processedIncomingWebData = async (
       }
     };
     await saveToDb(dbInstance, response!.processed!, 'web', PROFILE_ID);
+    if (mainWindow) {
+      mainWindow.webContents.send('article-saved');
+    }
     return response;
   } catch (err) {
     console.log('Processing error: ' + String(err));

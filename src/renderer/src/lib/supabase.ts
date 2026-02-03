@@ -39,3 +39,27 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: false // We handle URL parsing manually via Deep Link
   }
 });
+
+export const saveArticle = async (userId: string) => {
+  await supabase.from('user_activity').insert({
+    user_id: userId,
+    action_type: 'save_article',
+    metadata: {}
+  });
+};
+
+export const search = async (userId: string) => {
+  await supabase.from('user_activity').insert({
+    user_id: userId,
+    action_type: 'search',
+    metadata: {}
+  });
+};
+
+export const trackAppOpen = async (userId: string) => {
+  await supabase.from('user_activity').insert({
+    user_id: userId,
+    action_type: 'open_app',
+    metadata: {}
+  });
+};

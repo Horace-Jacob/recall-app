@@ -104,6 +104,14 @@ if (process.contextIsolated) {
           ipcRenderer.invoke('quit-and-install');
         }
       },
+      track: {
+        onSavedArticle: (callback: () => void) => {
+          ipcRenderer.on('article-saved', (_event) => callback());
+        },
+        removeArticleSavedListener: () => {
+          ipcRenderer.removeAllListeners('article-saved');
+        }
+      },
       bookmark: {
         getAvailableBrowsers: () => {
           return ipcRenderer.invoke('get-available-browsers');

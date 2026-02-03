@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@renderer/context/AuthContext';
 import { PROFILE_ID } from '@renderer/utils/constants';
+import { search } from '@renderer/lib/supabase';
 
 interface SearchResult {
   id: string;
@@ -108,6 +109,7 @@ export const SearchModal: FC<SearchModalProps> = ({ isOpen, onClose }) => {
     try {
       // Call the real API
       const result = await window.electronAPI.search.semanticSearch(PROFILE_ID, queryToSearch);
+      await search(session.user.id); // Track search activity
 
       if (result.success && result.data) {
         setAiResponse(result.data);
