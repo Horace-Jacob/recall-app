@@ -48,14 +48,11 @@ export const processedIncomingWebData = async (
     let excerpt: string | undefined = undefined;
     let wordCount = req.wordCount || 0;
     let readingTime: number | undefined = undefined;
-
     const canonicalUrl = req.url ? canonicalizeUrl(req.url) : null;
 
     if (canonicalUrl && !req.selectedOnly) {
       const existing = await findByCanonicalUrl(dbInstance, canonicalUrl, PROFILE_ID);
-      console.log(existing);
-      if (existing.save_type !== 'selection') {
-        console.log(existing);
+      if (existing && existing.save_type !== 'selection') {
         const ago = timeAgo(existing.created_at);
         return {
           id: req.id,
@@ -102,9 +99,10 @@ export const processedIncomingWebData = async (
         byline: byline || undefined,
         readingTime,
         savedId: '',
-        selectedOnly: req.selectedOnly
+        selectedOnly: req.selectedOnly || false
       }
     };
+    console.log('here');
     await saveToDb(dbInstance, response!.processed!, 'web', PROFILE_ID);
     if (mainWindow) {
       mainWindow.webContents.send('article-saved');
