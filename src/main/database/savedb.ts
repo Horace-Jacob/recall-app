@@ -1,7 +1,7 @@
 import Database from 'better-sqlite3';
 import { Processed } from '../types';
 import { cleanContent, trimForProcessing } from '../utils';
-import { embed, summarize } from '../data-processor/ai-processor';
+import { classifyContent, embed, summarize } from '../data-processor/ai-processor';
 
 export const saveToDb = async (
   dbInstance: Database.Database,
@@ -12,9 +12,9 @@ export const saveToDb = async (
   try {
     let embeddingBuf: any;
     const cleaned = cleanContent(data.content!);
-
     const trimmed = trimForProcessing(cleaned);
-    const summary = await summarize(trimmed);
+    const contentType = await classifyContent(trimmed);
+    const summary = await summarize(data.title, trimmed, contentType);
     const embedding = await embed(summary);
     if (embedding) {
       const arr = new Float32Array(embedding);
@@ -23,7 +23,7 @@ export const saveToDb = async (
     const current_time = Date.now();
     dbInstance
       .prepare(
-        `INSERT INTO memories (user_id, url, canonical_url, title, summary, intent, embedding, content, created_at, source_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO memories (user_id, url, canonical_url, title, summary, intent, content_type, save_type, embedding, content, created_at, source_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .run(
         userId,
@@ -32,6 +32,8 @@ export const saveToDb = async (
         data.title!,
         summary,
         data.intent || null,
+        contentType || null,
+        data.selectedOnly ? 'selection' : 'auto',
         embeddingBuf,
         data.content!,
         current_time,

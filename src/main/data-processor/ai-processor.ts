@@ -10,6 +10,13 @@ const openai = new OpenAI({
 const rateLimitMap = new Map<string, number>();
 const RATE_LIMIT_MS = 1000;
 const MAX_CACHE_SIZE = 1000;
+export type ContentType =
+  | 'explanation'
+  | 'procedure'
+  | 'reference'
+  | 'conversation'
+  | 'note'
+  | 'overview';
 
 const summaryCache = new Map<string, string>();
 const embeddingCache = new Map<string, number[]>();
@@ -28,8 +35,87 @@ const ensureRateLimit = async (key: string): Promise<void> => {
   rateLimitMap.set(key, Date.now());
 };
 
-export const summarize = async (text: string): Promise<any> => {
+const aiClassify = async (text: string): Promise<ContentType> => {
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [
+      {
+        role: 'system',
+        content:
+          'Classify the text as one of: explanation, procedure, reference, conversation, note. Return only one word.'
+      },
+      { role: 'user', content: text.slice(0, 2000) }
+    ],
+    max_completion_tokens: 5,
+    temperature: 0
+  });
+
+  const raw = response.choices[0].message.content ?? '';
+  return normalizeContentType(raw);
+};
+
+const normalizeContentType = (raw: string): ContentType => {
+  const value = raw.trim().toLowerCase();
+
+  if (
+    value === 'explanation' ||
+    value === 'procedure' ||
+    value === 'reference' ||
+    value === 'conversation' ||
+    value === 'note' ||
+    value === 'overview'
+  ) {
+    return value;
+  }
+
+  // soft mappings
+  if (value === 'description' || value === 'context' || value === 'general') {
+    return 'overview';
+  }
+
+  // hard fallback
+  return 'overview';
+};
+
+export const classifyContent = async (text: string): Promise<ContentType> => {
+  // Heuristics first (cheap + fast)
+  const hasSteps =
+    /^\s*\d+\.|\n-\s|\n\*\s/m.test(text) && /(step|first|then|next|finally)/i.test(text);
+
+  const hasCodeBlocks = /```[\s\S]*?```/.test(text);
+  const looksConversational = /(you can|let’s|imagine|here’s why|think of it)/i.test(text);
+
+  if (hasSteps) return 'procedure';
+  if (hasCodeBlocks) return 'reference';
+  if (looksConversational) return 'explanation';
+
+  // Fallback to AI (only if unclear)
+  return aiClassify(text);
+};
+
+export const summarize = async (
+  title: string | undefined,
+  text: string,
+  contentType: ContentType
+): Promise<any> => {
   console.log('📝 Generating summary...');
+  const instructionMap: Record<ContentType, string> = {
+    explanation:
+      'Summarize the core idea clearly for future recall. Focus on what this explains and why it matters. Remove filler.',
+
+    procedure: 'Summarize the steps in order. Preserve sequence, intent, and prerequisites.',
+
+    reference:
+      'Summarize what this is, what it is used for, and when to use it. Do not rewrite code or examples.',
+
+    conversation:
+      'Extract the main explanation, decision, or insight from the conversation. Remove conversational fluff.',
+
+    note: 'Extract the key idea or takeaway in one or two sentences.',
+
+    overview:
+      'You create memory summaries for later retrieval. Always anchor the summary to the subject or entity. If a title or name is provided, explicitly state who or what it refers to.'
+  };
   if (!text || typeof text !== 'string') {
     throw new Error('Invalid input: text must be a non-empty string');
   }
@@ -54,11 +140,15 @@ export const summarize = async (text: string): Promise<any> => {
       messages: [
         {
           role: 'system',
-          content: 'You are a helpful assistant that creates concise summaries.'
+          content: instructionMap[contentType]
         },
         {
           role: 'user',
-          content: `Summarize this in 2-3 sentences: ${text}`
+          content: `
+              Title: ${title ?? 'Unknown'}
+              Content:
+              ${text}
+            `
         }
       ],
       max_completion_tokens: 150,

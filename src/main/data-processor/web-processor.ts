@@ -53,7 +53,9 @@ export const processedIncomingWebData = async (
 
     if (canonicalUrl && !req.selectedOnly) {
       const existing = await findByCanonicalUrl(dbInstance, canonicalUrl, PROFILE_ID);
-      if (existing) {
+      console.log(existing);
+      if (existing.save_type !== 'selection') {
+        console.log(existing);
         const ago = timeAgo(existing.created_at);
         return {
           id: req.id,
@@ -99,7 +101,8 @@ export const processedIncomingWebData = async (
         excerpt: singleLineExcerpt,
         byline: byline || undefined,
         readingTime,
-        savedId: ''
+        savedId: '',
+        selectedOnly: req.selectedOnly
       }
     };
     await saveToDb(dbInstance, response!.processed!, 'web', PROFILE_ID);

@@ -26,9 +26,10 @@ export const findByCanonicalUrl = async (
   return dbInstance
     .prepare(
       `
-      SELECT id, created_at
+      SELECT id, created_at, save_type
       FROM memories
       WHERE user_id = ? AND canonical_url = ?
+      ORDER BY created_at DESC
       LIMIT 1
     `
     )

@@ -19,6 +19,7 @@ import 'dotenv/config';
 import { registerSingleUrlHandler } from './data-processor/handlers/register-single-url-handler';
 import { autoUpdater } from 'electron-updater';
 import { registerOnboardingHandlers } from './data-processor/handlers/register-onboarding-handler';
+import { migrateMemoriesTable } from './database/migrate-db';
 
 log.transports.file.level = 'info';
 
@@ -224,6 +225,7 @@ if (!gotTheLock) {
     createMemoriesTable(dbInstance);
     createRecentSearchesTable(dbInstance);
     createLocalSettingsTable(dbInstance);
+    migrateMemoriesTable(dbInstance);
 
     // Register handlers
     registerDbHandler(dbInstance);

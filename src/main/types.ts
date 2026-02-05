@@ -34,6 +34,7 @@ export interface Processed {
   byline?: string;
   readingTime?: number;
   savedId?: string;
+  selectedOnly?: boolean;
 }
 
 export type QueryDBParams = string | number | boolean | null;
