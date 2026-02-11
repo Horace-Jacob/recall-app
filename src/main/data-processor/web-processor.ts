@@ -36,6 +36,15 @@ const processWithReadability = (html: string, url: string): any => {
   }
 };
 
+const saveToDbAsync = async (dbInstance: Database.Database, processed: any) => {
+  try {
+    await saveToDb(dbInstance, processed, 'web', PROFILE_ID);
+  } catch (err) {
+    console.error('Failed to save to DB:', err);
+    // Optionally: implement retry logic or queue the failed save
+  }
+};
+
 export const processedIncomingWebData = async (
   dbInstance: Database.Database,
   req: IPCRequest
@@ -102,8 +111,10 @@ export const processedIncomingWebData = async (
         selectedOnly: req.selectedOnly || false
       }
     };
-    console.log('here');
-    await saveToDb(dbInstance, response!.processed!, 'web', PROFILE_ID);
+    saveToDbAsync(dbInstance, response.processed!).catch((err) => {
+      console.error('Background save error:', err);
+    });
+    // await saveToDb(dbInstance, response!.processed!, 'web', PROFILE_ID);
     if (mainWindow) {
       mainWindow.webContents.send('article-saved');
     }

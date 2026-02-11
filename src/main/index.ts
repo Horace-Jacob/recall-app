@@ -20,6 +20,7 @@ import { registerSingleUrlHandler } from './data-processor/handlers/register-sin
 import { autoUpdater } from 'electron-updater';
 import { registerOnboardingHandlers } from './data-processor/handlers/register-onboarding-handler';
 import { migrateMemoriesTable } from './database/migrate-db';
+import { ensureNativeMessagingSetup } from './services/ensure-native-messaging';
 
 log.transports.file.level = 'info';
 
@@ -217,7 +218,9 @@ if (!gotTheLock) {
 
     // Create Tray
     createTray();
-
+    if (app.isPackaged) {
+      ensureNativeMessagingSetup();
+    }
     // Start ICP Server
     startIPCServer(dbInstance, processedIncomingWebData);
 

@@ -39,7 +39,6 @@ export const saveToDb = async (
         current_time,
         sourceType
       );
-    console.log(`Saved memory for URL: ${data.url}`);
   } catch (error) {
     throw new Error((error as Error).message);
   }
